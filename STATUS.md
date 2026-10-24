@@ -1,6 +1,6 @@
 # Implementation status
 
-Updated 2026-10-24 for the 0.2.0 functional release work.
+Updated 2026-10-24 for the 0.2.0 public functional pre-release.
 
 ## Implemented
 
@@ -15,27 +15,28 @@ Updated 2026-10-24 for the 0.2.0 functional release work.
 - Room schema 1-to-2 automatic migration, usage high-water persistence, clock/elapsed/boot checkpoints and restart reconciliation.
 - Configurable daily warning thresholds, interruption/eligibility notifications and public CI workflow.
 - Separate private release-signing identity outside the repository.
+- Manual in-app GitHub Releases updates with notes/progress, bounded HTTPS downloads, digest checks when supplied, package/version/signing checks and Android-confirmed installation. No policy data is sent to GitHub.
 
 ## Verification
 
 - Previous tracking milestone: clean lint, 71 domain tests and six emulator tests passed; first APK installed/launched on API 36.
-- Current domain tests: 84 passing (50 monotonic-policy, 13 lifecycle/schedule/time-integrity, 21 usage accounting).
-- Current updated debug application: assembled successfully after fixing cross-module smart casts and using supported public APIs.
-- Full current instrumentation/lint run is pending. A lint analyzer failed when a new test file arrived during its analysis; the full stable-source rerun is in progress. No checks or tests were disabled.
-- New on-device tests cover request cancellation/eligible acceptance/replay rejection, essentials/corruption and a live Chrome-blocking/Settings-safety probe.
+- Current domain tests: 90 passing (50 monotonic-policy, 13 lifecycle/schedule/time-integrity, 21 usage accounting and six semantic-release-version tests).
+- Debug app, instrumentation APK and signed/minified release assembled successfully. Debug and release lint passed with warnings treated as errors. The final local gate completed in 6m33s.
+- Release APK verified by Android SDK apksigner: APK Signature Scheme v2, RSA 4096-bit certificate SHA-256 `4131ad43f7d1b5d32db16da0e706f557183b32e270b4099eb9caaad6858f78fd`.
+- [Fresh API 35 Android CI baseline](https://github.com/sajancodes/hardblocker-app/actions/runs/40085913613) passed all ten device tests, including a live Chrome-blocking/Settings-safety probe, request cancellation/eligible acceptance/replay rejection, essentials/corruption, Room and UI flows.
+- [Updater verification run](https://github.com/sajancodes/hardblocker-app/actions/runs/40086758132), code commit `fc5960c`, passed the build/domain-test/debug-lint job and all 12 Android instrumentation tests. This includes corrupt/same-version APK rejection; no empty results are accepted.
+- The local Windows emulator encountered system/launcher ANRs, and one earlier Gradle run produced an empty result. Those attempts are not counted as passes. Fresh Linux/KVM CI requires positive nonempty instrumentation results.
 
-## Before publishing the release
+## Release
 
-1. Finish the stable-source lint/instrumentation run; fix genuine failures.
-2. Exercise the real blocking path and inspect updated screens.
-3. Build and verify the signed/minified release APK, publish checksums/certificate fingerprint, push source and create the GitHub Release.
-4. Check public CI and record its result.
+Public source: https://github.com/sajancodes/hardblocker-app. Release: https://github.com/sajancodes/hardblocker-app/releases/tag/v0.2.0. Assets are the signed APK, SHA256SUMS.txt and SIGNING.txt. APK SHA-256: `87335427d10793f236d709f7a9fcc95ed7eea420a60cbd76ef32eadf5ca8c108`. Follow docs/RELEASING.md to publish future versions using the same key and increased versionCode/versionName.
 
 ## Known remaining validation
 
 - Device Owner provisioning/suspension has not yet been exercised on a separately provisioned device.
 - Broad OEM/physical-device testing, split-screen/PiP accounting, full battery profiling, localization and comprehensive accessibility review remain open.
 - Full corruption-recovery UX and stronger offline clock/reboot tamper resistance need further hardening. Essential system access is preserved for safety.
+- The first public release includes the updater, but a full previous-official-release → newer-official-release installation/policy-retention exercise still needs a second published version. The updater's rejection paths and version ordering are tested; Android performs final APK signature verification.
 - See SECURITY.md and PRIVACY.md for enforcement/privacy boundaries. This is an early functional release, not a guarantee of production hardening.
 
 ## Architecture and files
