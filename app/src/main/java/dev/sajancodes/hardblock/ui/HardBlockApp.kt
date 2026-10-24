@@ -70,7 +70,7 @@ fun HardBlockApp(model: DashboardViewModel, openUsageSettings: () -> Boolean) {
                 composable("dashboard") { Dashboard(state, model::refresh) { nav.navigate("protection") } }
                 composable("apps") { AppsScreen(state, model) }
                 composable("commitments") { CommitmentsScreen(state, model) }
-                composable("protection") { ProtectionScreen(state, model::acknowledge, openUsageSettings, model::refresh) }
+                composable("protection") { ProtectionScreen(state, model, model::acknowledge, openUsageSettings, model::refresh) }
             }
         }
         state.message?.let { message -> AlertDialog(onDismissRequest = model::clearMessage,
@@ -181,8 +181,9 @@ private fun AppIcon(app: InstalledApp) {
 }
 
 @Composable
-private fun ProtectionScreen(state: DashboardState, acknowledge: () -> Unit, openSettings: () -> Boolean, refresh: () -> Unit) {
+private fun ProtectionScreen(state: DashboardState, model: DashboardViewModel, acknowledge: () -> Unit, openSettings: () -> Boolean, refresh: () -> Unit) {
     val context = LocalContext.current
+    val update by model.updates.collectAsStateWithLifecycle()
     var showConsent by remember { mutableStateOf(false) }
     val notifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { refresh() }
     var unavailable by remember { mutableStateOf(false) }
@@ -191,7 +192,7 @@ private fun ProtectionScreen(state: DashboardState, acknowledge: () -> Unit, ope
         item {
             Text("01 / Local by default", color = Accent, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(8.dp))
-            Text("HardBlock reads app usage locally to calculate daily foreground time. It has no network permission and sends no app names, installed-app lists or usage history to a server.", color = Muted)
+            Text("HardBlock reads app usage locally to calculate daily foreground time. It sends no app names, installed-app lists or usage history to a server. Network access is used only when you check or download GitHub updates.", color = Muted)
         }
         item {
             Text("02 / Usage Access", color = Accent, fontWeight = FontWeight.SemiBold)
@@ -223,6 +224,22 @@ private fun ProtectionScreen(state: DashboardState, acknowledge: () -> Unit, ope
             androidx.compose.foundation.text.selection.SelectionContainer { Text("adb shell dpm set-device-owner dev.sajancodes.hardblock/.admin.AppDeviceAdminReceiver", color = Accent, fontSize = 13.sp) }
             Text("Verify with adb shell dpm list-owners. Then reopen HardBlock. Device Owner uses Android package suspension. Usage Access and Accessibility remain required for timely daily-limit and schedule monitoring. This app never wipes or resets devices.", color = Muted)
             TextButton(onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, "https://developer.android.com/work/dpc/dedicated-devices".toUri())) }.onFailure { unavailable = true } }) { Text("Official Android provisioning documentation") }
+        }
+        item {
+            Text("APP UPDATES", color = Accent, fontWeight = FontWeight.SemiBold)
+            Text("Installed ${dev.sajancodes.hardblock.BuildConfig.VERSION_NAME}", color = Muted)
+            Text("Check GitHub Releases manually. Downloads are verified against this app's package, newer version and signing identity. Android asks before installing; commitments and usage history stay in place.", color = Muted)
+            Text(update.message, color = Accent)
+            OutlinedButton(onClick = model::checkUpdates, enabled = !update.busy) { Text("Check for updates") }
+            update.release?.let { release ->
+                if (release.notes.isNotBlank()) Text(release.notes, color = Muted)
+                if (update.busy) { LinearProgressIndicator(modifier = Modifier.fillMaxWidth()); Text("${update.progress}%", color = Muted) }
+                if (!update.downloaded) Button(onClick = model::downloadUpdate, enabled = !update.busy) { Text("Download ${release.tag}") }
+                else Button(onClick = { model.installUpdate { intent ->
+                    runCatching { context.startActivity(intent) }.onFailure { unavailable = true }
+                } }, enabled = !update.busy) { Text("Install update") }
+            }
+            if (unavailable) Text("Android could not open the requested settings or installer.", color = MaterialTheme.colorScheme.error)
         }
         item {
             Text("THE COMMITMENT PRINCIPLE", fontSize = 11.sp, letterSpacing = 1.5.sp, color = Accent)

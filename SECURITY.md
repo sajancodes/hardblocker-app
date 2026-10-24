@@ -13,3 +13,5 @@ UsageStats is an Android estimate with limited event retention and OEM behavior.
 If persistence is unreadable, the app reports interrupted protection and rejects unsafe mutations. It never silently replaces the database using a destructive migration. Release builds are signed with a private key stored outside the source repository. APK checksums and certificate fingerprint are published with each release.
 
 To report a defect, open a GitHub issue without posting private app usage, signing keys or device backups.
+
+The manual GitHub updater follows HTTPS redirects only within GitHub/GitHubusercontent hosts, limits download sizes, checks asset digests when present and rejects wrong packages, old version codes and different signing certificates. Android's package installer verifies the APK's signatures before installation. Only a narrow private-cache FileProvider path is shared for installation. Future published APKs must retain the signing key and increase versionCode. Debug builds use a different key and cannot upgrade to the official release in place.

@@ -14,6 +14,7 @@ HardBlock is a local-first Android commitment blocker. Restrictions can become s
 - Room stores immutable originals, current revisions, audit history, usage intervals and requests. WorkManager reconciles after reboot/update and reports interrupted protection.
 - Persisted elapsed-time/boot checkpoints detect clock changes. Daily rules use pinned reset times and zones. Daily totals survive app restarts and cannot decrease within the same window.
 - Configurable daily warning thresholds and one-time notifications for protection interruption and eligible relaxation.
+- Protection → Check for updates finds newer GitHub Releases, downloads their APK and verifies the package, version and signing identity before Android asks you to install. Updates retain local commitments and history. Checks are manual; pre-releases are clearly labeled.
 
 **Standard Mode can be bypassed through Android system settings.** This is a voluntary self-control aid, not a security boundary against the phone owner. See [SECURITY.md](SECURITY.md) for precise limits and [PRIVACY.md](PRIVACY.md) for local data handling.
 

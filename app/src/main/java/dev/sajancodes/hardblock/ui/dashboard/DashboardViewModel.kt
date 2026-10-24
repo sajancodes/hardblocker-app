@@ -43,7 +43,15 @@ class DashboardViewModel @Inject constructor(
     private val policies: PolicyRepository,
     private val coordinator: EnforcementCoordinator,
     private val safety: ProtectedPackagesResolver,
+    private val updater: dev.sajancodes.hardblock.update.GitHubUpdater,
 ) : ViewModel() {
+    val updates = updater.state
+    private var updateJob: kotlinx.coroutines.Job? = null
+    fun checkUpdates() { if (updateJob?.isActive != true) updateJob = viewModelScope.launch { updater.check() } }
+    fun downloadUpdate() { if (updateJob?.isActive != true) updateJob = viewModelScope.launch { updater.download() } }
+    fun installUpdate(open: (android.content.Intent) -> Unit) {
+        if (updateJob?.isActive != true) updateJob = viewModelScope.launch { updater.installationIntent()?.let(open) }
+    }
     private val mutable = MutableStateFlow(DashboardState())
     val state = mutable.asStateFlow()
     init {
