@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">HardBlock</string>
+    <string name="close_app">Close app</string>
+    <string name="make_stricter">Make restriction stricter</string>
+    <string name="accessibility_description">HardBlock observes the foreground application package to enforce your voluntary commitments. It displays a blocking screen over restricted apps. It does not read screen content, typed text, or passwords, and does not send data to servers. You may revoke this service in Android Settings; Standard Mode is bypassable.</string>
+</resources>
