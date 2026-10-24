@@ -10,3 +10,4 @@ captures/
 *.properties.secret
 *signing.properties
 docs/NEXT_AGENT_PROMPT.md
+/dist/

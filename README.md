@@ -23,6 +23,7 @@ Download the signed APK from [GitHub Releases](https://github.com/sajancodes/har
 
 1. Open Protection and grant Usage Access.
 2. Read the Accessibility disclosure and voluntarily enable HardBlock in Android Accessibility Settings. Return to the app and check status.
+   If Android restricts Accessibility for a sideloaded APK, review App info → the menu → Allow restricted settings, where offered by Android. HardBlock cannot enable this system setting for you.
 3. Optionally permit notifications. In Applications, mark additional authenticators essential before activating commitments.
 4. Open Commitments, choose apps and a restriction, set commitment/cooldown/reset details, review the exact warning and explicitly confirm.
 5. To make changes, review the policy. Stronger edits apply immediately. Weaker changes must be requested and later explicitly accepted; they never apply automatically.
@@ -47,6 +48,7 @@ Open in Android Studio with JDK 21 and Android SDK 37. Let Gradle install missin
 ```powershell
 .\gradlew.bat :core:test :app:assembleDebug :app:lintDebug --console=plain --max-workers=2
 .\gradlew.bat :app:connectedDebugAndroidTest --console=plain --max-workers=2
+.\scripts\verify-device.ps1 -Serial emulator-5554
 ```
 
 The core module is Android independent. The app module uses Compose Material 3, Navigation Compose, MVVM/StateFlow, Hilt, Room, DataStore and WorkManager. All policy writes go through PolicyRepository, PolicyEngine and a Room transaction; enforcement is reconciled separately. Original configuration and decision history are retained.
